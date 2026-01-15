@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACHIEVEMENT CAKE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 登录/注册弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .auth-modal {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .auth-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .auth-form h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .auth-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .auth-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .auth-message.success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            display: block;
+        }
+        
+        .auth-message.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            display: block;
+        }
+        
+        /* 顶部按钮组 */
+        .top-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 999;
+        }
+        
+        .logout-btn, .reset-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .logout-btn:hover, .reset-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .reset-btn {
+            background-color: #f39c12;
+        }
+        
+        .reset-btn:hover {
+            background-color: #d68910;
+        }
+        
+        /* 重置确认弹窗 */
+        .reset-confirm {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .reset-modal {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .reset-modal h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .reset-modal p {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        
+        .reset-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .reset-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .reset-confirm-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .reset-cancel-btn {
+            background-color: #bdc3c7;
+            color: #2c3e50;
+        }
+        
+        /* 主内容区域 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+            border-right: 5px solid #2ecc71;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .user-info-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .username {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .user-email {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .unlock-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px 15px;
+            color: #856404;
+        }
+        
+        .unlock-info i {
+            margin-right: 5px;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .module {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .module:hover {
+            transform: translateY(-5px);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .module-icon.view {
+            background-color: #2ecc71;
+        }
+        
+        .module-icon.my {
+            background-color: #9b59b6;
+        }
+        
+        .module-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .module-subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .locked-module {
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .locked-icon {
+            font-size: 3rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .locked-text {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .locked-date {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .input-area {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-area:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn.view {
+            background-color: #2ecc71;
+        }
+        
+        .btn.view:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn.my {
+            background-color: #9b59b6;
+        }
+        
+        .btn.my:hover {
+            background-color: #8e44ad;
+        }
+        
+        .btn.modify {
+            background-color: #f39c12;
+        }
+        
+        .btn.modify:hover {
+            background-color: #d68910;
+        }
+        
+        .code-display {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+            display: none;
+        }
+        
+        .code-display.show {
+            display: block;
+        }
+        
+        .code-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .code-value {
+            font-family: monospace;
+            font-size: 1.5rem;
+            background-color: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px dashed #3498db;
+            text-align: center;
+            letter-spacing: 2px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .content-display {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            min-height: 120px;
+            display: none;
+        }
+        
+        .content-display.show {
+            display: block;
+        }
+        
+        .content-display .content-text {
+            line-height: 1.6;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons .btn {
+            width: 50%;
+        }
+        
+        .modify-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .modify-buttons .btn {
+            flex: 1;
+        }
+        
+        .system-status {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid #e74c3c;
+        }
+        
+        .system-status h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .system-status h3 i {
+            margin-right: 10px;
+            color: #e74c3c;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .status-item h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .status-item p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+        
+        .status-item .count {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        
+        .status.success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            display: block;
+        }
+        
+        .status.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            display: block;
+        }
+        
+        .status.info {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #2980b9;
+            display: block;
+        }
+        
+        .status.warning {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+            display: block;
+        }
+        
+        .rules {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .rules h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .rules ul {
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .rules li {
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+        
+        .rules li i {
+            color: #3498db;
+            margin-right: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .empty-state h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .module {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons, .modify-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn, .modify-buttons .btn {
+                width: 100%;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-modal {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .top-buttons {
+                flex-direction: column;
+                right: 10px;
+            }
+            
+            .reset-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部按钮组 -->
+    <div class="top-buttons" id="topButtons" style="display: none;">
+        <button class="reset-btn" id="resetBtn">
+            <i class="fas fa-redo"></i> 重置数据
+        </button>
+        <button class="logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> 登出
+        </button>
+    </div>
+    
+    <!-- 重置确认弹窗 -->
+    <div id="resetConfirm" class="reset-confirm">
+        <div class="reset-modal">
+            <h3><i class="fas fa-exclamation-triangle"></i> 确认重置数据</h3>
+            <p>这将清除系统中所有用户数据、提交内容和分配记录，只保留当前登录的用户账户。</p>
+            <p><strong>此操作不可撤销！</strong></p>
+            <div class="reset-actions">
+                <button class="reset-confirm-btn" id="resetConfirmBtn">确认重置</button>
+                <button class="reset-cancel-btn" id="resetCancelBtn">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户信息面板 -->
+    <div id="userPanel" class="user-info-panel" style="display: none;">
+        <div class="user-info">
+            <div class="username">欢迎，<span id="currentUsername"></span></div>
+            <div class="user-email" id="currentUserEmail"></div>
+        </div>
+        <div class="unlock-info">
+            <i class="fas fa-lock"></i>
+            查看模块将于 <span id="unlockDate">2024年1月20日 00:00</span> 解锁
+        </div>
+    </div>
+    
+    <!-- 登录/注册弹窗 -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-modal">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">登录</div>
+                <div class="auth-tab" data-tab="register">注册</div>
+            </div>
+            
+            <div id="loginForm" class="auth-form active">
+                <h3>登录账户</h3>
+                <div class="form-group">
+                    <label for="loginEmail">邮箱地址</label>
+                    <input type="email" id="loginEmail" placeholder="请输入您的邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                </div>
+                <button class="auth-btn" id="loginBtn">登录</button>
+                <div id="loginMessage" class="auth-message"></div>
+            </div>
+            
+            <div id="registerForm" class="auth-form">
+                <h3>注册新账户</h3>
+                <div class="form-group">
+                    <label for="registerUsername">用户名</label>
+                    <input type="text" id="registerUsername" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">邮箱地址</label>
+                    <input type="email" id="registerEmail" placeholder="请输入您的邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">密码</label>
+                    <input type="password" id="registerPassword" placeholder="请输入密码（至少6位）">
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">确认密码</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="请再次输入密码">
+                </div>
+                <button class="auth-btn" id="registerBtn">注册</button>
+                <div id="registerMessage" class="auth-message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主内容区域 -->
+    <div class="container" id="mainContent" style="display: none;">
+        <header>
+            <h1><i class="fas fa-user-secret"></i> ACHIEVEMENT CAKE</h1>
+            <p class="description">
+        </header>
+        
+        <div class="content">
+            <!-- 输入模块 -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div>
+                        <h2 class="module-title">提交/修改内容</h2>
+                        <p class="module-subtitle">输入您的匿名成就内容，提交后将获得唯一编码。在分配功能解锁前可对内容实现修改。</p>
+                    </div>
+                </div>
+                
+                <textarea class="input-area" id="userInput" placeholder="请输入您的成就内容..." maxlength="300"></textarea>
+                <div class="char-count" style="text-align: right; margin-bottom: 15px; color: #7f8c8d;">
+                    <span id="charCount">0</span>/300
+                </div>
+                
+                <div class="action-buttons" id="submitButtons" style="display: none;">
+                    <button class="btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> 提交内容
+                    </button>
+                    <button class="btn my" id="viewMyBtn">
+                        <i class="fas fa-eye"></i> 查看我的内容
+                    </button>
+                </div>
+                
+                <div class="modify-buttons" id="modifyButtons" style="display: none;">
+                    <button class="btn modify" id="modifyBtn">
+                        <i class="fas fa-edit"></i> 修改内容
+                    </button>
+                    <button class="btn my" id="viewMyBtn2">
+                        <i class="fas fa-eye"></i> 查看我的内容
+                    </button>
+                </div>
+                
+                <div class="code-display" id="codeDisplay">
+                    <div class="code-label">您的唯一编码：</div>
+                    <div class="code-value" id="codeValue">ABCD-1234</div>
+                    <p style="color: #7f8c8d; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> 使用此编码可以查看您提交的内容
+                    </p>
+                </div>
+
+                <div class="content-display" id="myContentDisplay">
+                    <div class="code-label">您提交的内容：</div>
+                    <div class="content-text" id="myContentText"></div>
+                </div>
+                
+                <div class="status" id="inputStatus"></div>
+            </div>
+            
+            <!-- 查看模块 -->
+            <div class="module locked-module" id="viewModule">
+                <div class="locked-overlay" id="lockedOverlay">
+                    <div class="locked-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="locked-text">查看模块已锁定</div>
+                    <div>解锁时间：<span class="locked-date" id="unlockTime">2024年1月20日 00:00</span></div>
+                    <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;">
+                        距离解锁还有：<span id="countdown">0天0小时0分钟0秒</span>
+                    </div>
+                </div>
+                
+                <div class="module-header">
+                    <div class="module-icon view">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <div>
+                        <h2 class="module-title">查看分配内容</h2>
+                        <p class="module-subtitle">系统为您分配一条其他人的内容查看</p>
+                    </div>
+                </div>
+                
+                <!-- 空状态提示 -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h4>尚未分配内容</h4>
+                    <p>解锁时间（2026年1月20日 00:00）后，系统将为所有已提交内容的用户分配查看内容</p>
+                    <p>请确保在解锁前提交您的内容</p>
+                </div>
+                
+                <!-- 已有分配的内容 -->
+                <div id="assignedSection" style="display: none;">
+                    <div class="status info" id="viewInfo">
+                        <i class="fas fa-info-circle"></i> 点击下方按钮查看分配给您的唯一内容
+                    </div>
+                    
+                    <button class="btn view" id="getAssignedBtn">
+                        <i class="fas fa-eye"></i> 查看分配给我的内容
+                    </button>
+                    
+                    <div class="content-display" id="assignedContentDisplay">
+                        <div class="code-label">分配给您的唯一内容：</div>
+                        <div class="content-text" id="assignedContentText"></div>
+                    </div>
+                </div>
+                
+                <div class="status" id="viewStatus"></div>
+            </div>
+        </div>
+        
+        <div class="system-status">
+            <h3><i class="fas fa-chart-bar"></i> 系统状态</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <h4>总用户数</h4>
+                    <p>系统中已有 <span class="count" id="totalUsers">0</span> 位注册用户</p>
+                </div>
+                <div class="status-item">
+                    <h4>总提交数</h4>
+                    <p>系统中已有 <span class="count" id="totalSubmissions">0</span> 条内容</p>
+                </div>
+                <div class="status-item">
+                    <h4>待分配用户</h4>
+                    <p><span class="count" id="pendingUsers">0</span> 位用户等待分配</p>
+                </div>
+                <div class="status-item">
+                    <h4>解锁倒计时</h4>
+                    <p><span class="count" id="unlockCountdown">0天</span></p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #f39c12;">
+                <h4><i class="fas fa-exclamation-triangle"></i> 数据一致性检查</h4>
+                <p id="dataConsistency" style="margin-top: 5px; color: #27ae60; font-size: 0.95rem;">
+                    <i class="fas fa-check-circle"></i> 数据正常
+                </p>
+            </div>
+        </div>
+        
+        <div class="rules">
+            <h3><i class="fas fa-exclamation-circle"></i> 系统规则说明</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> 每个注册用户只能提交<strong>一条</strong>匿名内容</li>
+                <li><i class="fas fa-check-circle"></i> 在查看模块解锁前，用户可以<strong>修改</strong>已提交的内容</li>
+                <li><i class="fas fa-check-circle"></i> 查看模块将于<strong>2026年1月20日 00:00</strong>解锁</li>
+                <li><i class="fas fa-check-circle"></i> 解锁后，系统一次性为所有用户进行<strong>完美匹配分配</strong></li>
+                <li><i class="fas fa-check-circle"></i> 请根据抽选到的匿名内容准备一份礼物🎁吧</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval = null;
+        // 系统配置
+        const UNLOCK_DATE = new Date('2026-01-15T21:30:00'); // 解锁时间：2024年1月20日
+        const isUnlocked = () => new Date() >= UNLOCK_DATE;
+        
+        // 模拟数据库
+        let users = JSON.parse(localStorage.getItem('anonymousSystemUsers')) || [];
+        let submissions = JSON.parse(localStorage.getItem('anonymousSubmissions')) || [];
+        let assignments = JSON.parse(localStorage.getItem('anonymousAssignments')) || {};
+        
+        // 当前登录用户
+        let currentUser = null;
+        
+                // 显示倒计时
+        function updateCountdown() {
+            const now = new Date();
+            const diff = UNLOCK_DATE - now;
+            
+            if (diff <= 0) {
+                document.getElementById('countdown').textContent = '已解锁！';
+                document.getElementById('unlockCountdown').textContent = '已解锁';
+                
+                // 解锁后检查是否需要执行分配
+                if (!localStorage.getItem('systemAllocationDone')) {
+                    performSystemMatching();
+                    localStorage.setItem('systemAllocationDone', 'true');
+                }
+                
+                // 解锁界面
+                document.getElementById('lockedOverlay').style.display = 'none';
+                document.getElementById('viewModule').classList.remove('locked-module');
+                updateAssignedSection();
+                updateAssignedSection();
+        
+                // 清除倒计时定时器
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdown').textContent = 
+                `${days}天${hours}小时${minutes}分钟${seconds}秒`;
+            document.getElementById('unlockCountdown').textContent = `${days}天${hours}小时`;
+        }
+
+        function checkUnlockStatus() {
+            if (isUnlocked()) {
+                // 如果已经解锁
+                document.getElementById('lockedOverlay').style.display = 'none';
+                document.getElementById('viewModule').classList.remove('locked-module');
+        
+                // 检查是否需要执行分配
+                if (!localStorage.getItem('systemAllocationDone')) {
+                    performSystemMatching();
+                    localStorage.setItem('systemAllocationDone', 'true');
+                }
+        
+                updateAssignedSection();
+        
+                // 清除倒计时定时器
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            } else {
+            // 如果尚未解锁，启动倒计时
+                if (!countdownInterval) {
+                    updateCountdown(); // 立即更新一次
+                    countdownInterval = setInterval(updateCountdown, 1000); // 每秒更新一次
+                }
+            }
+        }
+
+        // 数据一致性检查
+        function checkDataConsistency() {
+            let issues = [];
+            
+            // 检查提交与用户的对应关系
+            const submissionUserIds = submissions.map(s => s.userId);
+            const existingUserIds = users.map(u => u.id);
+            
+            // 查找无效的提交（用户不存在）
+            const invalidSubmissions = submissionUserIds.filter(id => !existingUserIds.includes(id));
+            if (invalidSubmissions.length > 0) {
+                issues.push(`发现 ${invalidSubmissions.length} 条无效提交（用户不存在）`);
+            }
+            
+            // 检查分配与用户的对应关系
+            const assignedUserIds = Object.keys(assignments);
+            const invalidAssignments = assignedUserIds.filter(id => !existingUserIds.includes(id));
+            if (invalidAssignments.length > 0) {
+                issues.push(`发现 ${invalidAssignments.length} 条无效分配（用户不存在）`);
+            }
+            
+            // 检查分配与提交的对应关系
+            for (const userId in assignments) {
+                const assignedCode = assignments[userId];
+                const submissionExists = submissions.some(s => s.code === assignedCode);
+                if (!submissionExists) {
+                    issues.push(`用户 ${userId} 的分配内容不存在`);
+                }
+            }
+            
+            // 检查用户是否有多条提交
+            const userSubmissionCount = {};
+            submissions.forEach(sub => {
+                userSubmissionCount[sub.userId] = (userSubmissionCount[sub.userId] || 0) + 1;
+            });
+            
+            const multipleSubmissions = Object.entries(userSubmissionCount).filter(([_, count]) => count > 1);
+            if (multipleSubmissions.length > 0) {
+                issues.push(`发现 ${multipleSubmissions.length} 个用户有多条提交`);
+            }
+            
+            // 更新显示
+            const consistencyElement = document.getElementById('dataConsistency');
+            if (issues.length === 0) {
+                consistencyElement.innerHTML = '<i class="fas fa-check-circle"></i> 数据正常';
+                consistencyElement.style.color = '#27ae60';
+            } else {
+                consistencyElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> 发现 ${issues.length} 个数据问题`;
+                consistencyElement.style.color = '#e74c3c';
+                consistencyElement.title = issues.join('\n');
+            }
+            
+            return issues;
+        }
+        
+        // 数据修复函数
+        function fixDataIssues() {
+            let fixed = false;
+            
+            // 修复1：移除无效用户的提交
+            const existingUserIds = users.map(u => u.id);
+            const validSubmissions = submissions.filter(s => existingUserIds.includes(s.userId));
+            
+            if (validSubmissions.length !== submissions.length) {
+                submissions = validSubmissions;
+                localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+                fixed = true;
+                console.log('已修复：移除无效用户的提交');
+            }
+            
+            // 修复2：移除无效用户的分配
+            const validAssignments = {};
+            for (const userId in assignments) {
+                if (existingUserIds.includes(userId)) {
+                    validAssignments[userId] = assignments[userId];
+                }
+            }
+            
+            if (Object.keys(validAssignments).length !== Object.keys(assignments).length) {
+                assignments = validAssignments;
+                localStorage.setItem('anonymousAssignments', JSON.stringify(assignments));
+                fixed = true;
+                console.log('已修复：移除无效用户的分配');
+            }
+            
+            // 修复3：确保每个用户只有一条提交（保留最新的一条）
+            const userLatestSubmission = {};
+            submissions.forEach(sub => {
+                if (!userLatestSubmission[sub.userId] || 
+                    new Date(sub.timestamp) > new Date(userLatestSubmission[sub.userId].timestamp)) {
+                    userLatestSubmission[sub.userId] = sub;
+                }
+            });
+            
+            const uniqueSubmissions = Object.values(userLatestSubmission);
+            if (uniqueSubmissions.length !== submissions.length) {
+                submissions = uniqueSubmissions;
+                localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+                fixed = true;
+                console.log('已修复：确保每个用户只有一条提交');
+            }
+            
+            // 修复4：重置已解锁用户的查看状态（如果分配不存在）
+            if (isUnlocked()) {
+                let resetCount = 0;
+                users.forEach(user => {
+                    if (user.hasViewedAssigned && !assignments[user.id]) {
+                        user.hasViewedAssigned = false;
+                        resetCount++;
+                    }
+                });
+                
+                if (resetCount > 0) {
+                    localStorage.setItem('anonymousSystemUsers', JSON.stringify(users));
+                    fixed = true;
+                    console.log(`已修复：重置 ${resetCount} 个用户的查看状态`);
+                }
+            }
+            
+            return fixed;
+        }
+        
+        // 字符计数
+        const userInput = document.getElementById('userInput');
+        const charCount = document.getElementById('charCount');
+        
+        userInput.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+        
+        // 用户认证相关函数
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'auth-message ' + type;
+            setTimeout(() => {
+                element.className = 'auth-message';
+            }, 3000);
+        }
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // 注册功能
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // 验证输入
+            if (!username || !email || !password || !confirmPassword) {
+                showMessage('registerMessage', '请填写所有字段', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('registerMessage', '请输入有效的邮箱地址', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('registerMessage', '密码至少需要6位', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('registerMessage', '两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            // 检查邮箱是否已注册
+            if (users.some(user => user.email === email)) {
+                showMessage('registerMessage', '该邮箱已注册', 'error');
+                return;
+            }
+            
+            // 检查用户名是否已存在
+            if (users.some(user => user.username === username)) {
+                showMessage('registerMessage', '该用户名已存在', 'error');
+                return;
+            }
+            
+            // 创建新用户
+            const newUser = {
+                id: 'USER-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                username: username,
+                email: email,
+                password: password, // 实际应用中应该加密存储
+                createdAt: new Date().toISOString(),
+                hasViewedAssigned: false
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('anonymousSystemUsers', JSON.stringify(users));
+            
+            showMessage('registerMessage', '注册成功！请登录', 'success');
+            
+            // 切换到登录标签
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === 'login') {
+                    tab.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+                if (form.id === 'loginForm') {
+                    form.classList.add('active');
+                }
+            });
+            
+            // 清空注册表单
+            document.getElementById('registerUsername').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('registerConfirmPassword').value = '';
+            
+            // 自动填写登录邮箱
+            document.getElementById('loginEmail').value = email;
+        });
+        
+        // 登录功能
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('loginMessage', '请填写邮箱和密码', 'error');
+                return;
+            }
+            
+            // 查找用户
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                showMessage('loginMessage', '邮箱或密码错误', 'error');
+                return;
+            }
+            
+            // 登录成功
+            currentUser = user;
+            localStorage.setItem('currentUserId', user.id);
+            
+            // 隐藏登录界面，显示主界面
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('userPanel').style.display = 'flex';
+            document.getElementById('topButtons').style.display = 'flex';
+            
+            // 显示用户信息
+            document.getElementById('currentUsername').textContent = user.username;
+            document.getElementById('currentUserEmail').textContent = user.email;
+            
+            // 初始化用户界面
+            initUserUI();
+        });
+        
+        // 登出功能
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            currentUser = null;
+            localStorage.removeItem('currentUserId');
+            
+            // 显示登录界面，隐藏主界面
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'none';
+            document.getElementById('topButtons').style.display = 'none';
+            
+            // 清空登录表单
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        });
+        
+        // 重置数据功能
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('resetConfirm').style.display = 'flex';
+        });
+        
+        document.getElementById('resetCancelBtn').addEventListener('click', function() {
+            document.getElementById('resetConfirm').style.display = 'none';
+        });
+        
+        document.getElementById('resetConfirmBtn').addEventListener('click', function() {
+            resetSystemData();
+            document.getElementById('resetConfirm').style.display = 'none';
+        });
+        
+        // 重置系统数据
+        function resetSystemData() {
+            if (!currentUser) return;
+            
+            // 保存当前用户
+            const savedUser = currentUser;
+            
+            // 清空所有数据
+            submissions = [];
+            assignments = {};
+            
+            // 重置用户数据（只保留当前用户）
+            users = [{
+                id: savedUser.id,
+                username: savedUser.username,
+                email: savedUser.email,
+                password: savedUser.password,
+                createdAt: savedUser.createdAt,
+                hasViewedAssigned: false // 重置查看状态
+            }];
+            
+            // 重置系统状态
+            localStorage.removeItem('systemAllocationDone');
+            
+            // 保存重置后的数据
+            localStorage.setItem('anonymousSystemUsers', JSON.stringify(users));
+            localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+            localStorage.setItem('anonymousAssignments', JSON.stringify(assignments));
+            localStorage.setItem('currentUserId', savedUser.id);
+            
+            // 重新初始化界面
+            initUserUI();
+
+            checkUnlockStatus();
+
+            
+            // 显示成功消息
+            alert('数据重置成功！系统已恢复到初始状态。');
+        }
+        
+        // 切换登录/注册标签
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // 更新标签状态
+                document.querySelectorAll('.auth-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // 显示对应表单
+                document.querySelectorAll('.auth-form').forEach(form => {
+                    form.classList.remove('active');
+                });
+                document.getElementById(tabName + 'Form').classList.add('active');
+                
+                // 清空消息
+                document.getElementById('loginMessage').className = 'auth-message';
+                document.getElementById('registerMessage').className = 'auth-message';
+            });
+        });
+        
+        // 检查是否已登录
+        function checkLoginStatus() {
+            const savedUserId = localStorage.getItem('currentUserId');
+            if (savedUserId) {
+                const user = users.find(u => u.id === savedUserId);
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('authOverlay').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.getElementById('userPanel').style.display = 'flex';
+                    document.getElementById('topButtons').style.display = 'flex';
+                    
+                    document.getElementById('currentUsername').textContent = user.username;
+                    document.getElementById('currentUserEmail').textContent = user.email;
+                    
+                    initUserUI();
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // 初始化用户界面
+        function initUserUI() {
+            if (!currentUser) return;
+            
+            // 先进行数据修复
+            if (fixDataIssues()) {
+                console.log('已自动修复数据问题');
+            }
+            
+            // 检查数据一致性
+            checkDataConsistency();
+            
+            // 更新系统状态显示
+            updateSystemStatus();
+            
+            // 查找用户是否已提交内容
+            const userSubmission = submissions.find(s => s.userId === currentUser.id);
+            
+            if (userSubmission) {
+                // 用户已提交内容
+                document.getElementById('submitButtons').style.display = 'none';
+                document.getElementById('modifyButtons').style.display = 'flex';
+                
+                userInput.value = userSubmission.content;
+                userInput.disabled = true;
+                charCount.textContent = userSubmission.content.length;
+                
+                document.getElementById('codeValue').textContent = userSubmission.code;
+                document.getElementById('codeDisplay').classList.add('show');
+            } else {
+                // 用户未提交内容
+                document.getElementById('submitButtons').style.display = 'flex';
+                document.getElementById('modifyButtons').style.display = 'none';
+                
+                userInput.value = '';
+                userInput.disabled = false;
+                charCount.textContent = '0';
+                
+                document.getElementById('codeDisplay').classList.remove('show');
+                document.getElementById('myContentDisplay').classList.remove('show');
+            }
+            
+            // 检查查看模块是否解锁
+            checkUnlockStatus();
+            
+            // 重置用户的查看状态（如果是解锁前）
+            if (!isUnlocked() && currentUser.hasViewedAssigned) {
+                currentUser.hasViewedAssigned = false;
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex].hasViewedAssigned = false;
+                    localStorage.setItem('anonymousSystemUsers', JSON.stringify(users));
+                }
+            }
+        }
+        
+        // 更新分配内容区域显示
+        function updateAssignedSection() {
+            if (!currentUser) return;
+            
+            const hasAssignment = assignments[currentUser.id];
+            
+            if (hasAssignment) {
+                // 用户已有分配
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('assignedSection').style.display = 'block';
+                
+                // 检查用户是否已查看
+                if (currentUser.hasViewedAssigned) {
+                    document.getElementById('getAssignedBtn').disabled = true;
+                    document.getElementById('getAssignedBtn').innerHTML = '<i class="fas fa-check"></i> 已查看分配内容';
+                    
+                    // 显示已查看的内容
+                    const assignedCode = assignments[currentUser.id];
+                    const assignedSubmission = submissions.find(s => s.code === assignedCode);
+                    if (assignedSubmission) {
+                        document.getElementById('assignedContentText').textContent = assignedSubmission.content;
+                        document.getElementById('assignedContentDisplay').classList.add('show');
+                    }
+                } else {
+                    document.getElementById('getAssignedBtn').disabled = false;
+                    document.getElementById('getAssignedBtn').innerHTML = '<i class="fas fa-eye"></i> 查看分配给我的内容';
+                }
+            } else {
+                // 用户尚无分配
+                if (isUnlocked()) {
+                    // 已解锁但无分配
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('assignedSection').style.display = 'none';
+                }
+            }
+        }
+        
+        // 提交内容
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            if (!currentUser) return;
+            
+            const content = userInput.value.trim();
+            
+            if (content.length < 10) {
+                showStatus('inputStatus', '内容至少需要10个字符', 'error');
+                return;
+            }
+            
+            if (content.length > 300) {
+                showStatus('inputStatus', '内容不能超过300个字符', 'error');
+                return;
+            }
+            
+            // 检查用户是否已有提交
+            const existingSubmissionIndex = submissions.findIndex(s => s.userId === currentUser.id);
+            if (existingSubmissionIndex !== -1) {
+                // 更新现有提交
+                submissions[existingSubmissionIndex].content = content;
+                submissions[existingSubmissionIndex].timestamp = new Date().toISOString();
+                showStatus('inputStatus', '内容更新成功！', 'success');
+            } else {
+                // 创建新提交
+                const code = generateUniqueCode();
+                const submission = {
+                    code: code,
+                    content: content,
+                    userId: currentUser.id,
+                    username: currentUser.username,
+                    timestamp: new Date().toISOString(),
+                    viewCount: 0
+                };
+                submissions.push(submission);
+                showStatus('inputStatus', '提交成功！您的编码为：' + code, 'success');
+            }
+            
+            localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+            
+            // 更新用户界面
+            initUserUI();
+        });
+        
+        // 修改内容
+        document.getElementById('modifyBtn').addEventListener('click', function() {
+            if (!currentUser) return;
+            
+            // 检查是否已解锁
+            if (isUnlocked()) {
+                showStatus('inputStatus', '查看模块已解锁，无法再修改内容', 'error');
+                return;
+            }
+            
+            userInput.disabled = false;
+            this.innerHTML = '<i class="fas fa-save"></i> 保存修改';
+            
+            // 临时修改onclick处理函数
+            this.onclick = saveModifiedContent;
+            
+            showStatus('inputStatus', '您现在可以修改内容，修改完成后点击保存', 'info');
+        });
+        
+        // 保存修改的内容
+        function saveModifiedContent() {
+            if (!currentUser) return;
+            
+            const content = userInput.value.trim();
+            
+            if (content.length < 10) {
+                showStatus('inputStatus', '内容至少需要10个字符', 'error');
+                return;
+            }
+            
+            if (content.length > 300) {
+                showStatus('inputStatus', '内容不能超过300个字符', 'error');
+                return;
+            }
+            
+            // 查找并更新用户提交的内容
+            const submissionIndex = submissions.findIndex(s => s.userId === currentUser.id);
+            if (submissionIndex !== -1) {
+                submissions[submissionIndex].content = content;
+                submissions[submissionIndex].timestamp = new Date().toISOString();
+                localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+            }
+            
+            userInput.disabled = true;
+            document.getElementById('modifyBtn').innerHTML = '<i class="fas fa-edit"></i> 修改内容';
+            document.getElementById('modifyBtn').onclick = function() {
+                document.getElementById('modifyBtn').click();
+            };
+            
+            showStatus('inputStatus', '内容修改成功！', 'success');
+        }
+        
+        // 查看自己的内容
+        document.getElementById('viewMyBtn').addEventListener('click', function() {
+            viewMyContent();
+        });
+        
+        document.getElementById('viewMyBtn2').addEventListener('click', function() {
+            viewMyContent();
+        });
+        
+        function viewMyContent() {
+            if (!currentUser) return;
+            
+            const userSubmission = submissions.find(s => s.userId === currentUser.id);
+            
+            if (!userSubmission) {
+                showStatus('inputStatus', '您还没有提交内容', 'error');
+                return;
+            }
+            
+            document.getElementById('myContentText').textContent = userSubmission.content;
+            document.getElementById('myContentDisplay').classList.add('show');
+            document.getElementById('codeDisplay').classList.remove('show');
+            
+            showStatus('inputStatus', '已显示您提交的内容', 'success');
+        }
+        
+        // 查看分配的内容
+        document.getElementById('getAssignedBtn').addEventListener('click', function() {
+            if (!currentUser) return;
+            
+            // 检查是否已解锁
+            if (!isUnlocked()) {
+                showStatus('viewStatus', '查看模块尚未解锁，请等待解锁时间', 'error');
+                return;
+            }
+            
+            // 检查用户是否已有分配
+            if (!assignments[currentUser.id]) {
+                showStatus('viewStatus', '系统尚未为您分配内容', 'warning');
+                return;
+            }
+            
+            // 检查用户是否已查看过分配内容
+            if (currentUser.hasViewedAssigned) {
+                showStatus('viewStatus', '您已经查看过分配的内容，每个用户只能查看一次', 'error');
+                return;
+            }
+            
+            // 获取分配的内容编码
+            const assignedCode = assignments[currentUser.id];
+            
+            if (!assignedCode) {
+                showStatus('viewStatus', '系统尚未为您分配内容', 'error');
+                return;
+            }
+            
+            // 查找分配的内容
+            const assignedSubmission = submissions.find(s => s.code === assignedCode);
+            
+            if (!assignedSubmission) {
+                showStatus('viewStatus', '分配的内容不存在', 'error');
+                return;
+            }
+            
+            // 显示分配的内容
+            document.getElementById('assignedContentText').textContent = assignedSubmission.content;
+            document.getElementById('assignedContentDisplay').classList.add('show');
+            
+            // 更新查看次数
+            assignedSubmission.viewCount = (assignedSubmission.viewCount || 0) + 1;
+            localStorage.setItem('anonymousSubmissions', JSON.stringify(submissions));
+            
+            // 更新用户状态
+            currentUser.hasViewedAssigned = true;
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex].hasViewedAssigned = true;
+                localStorage.setItem('anonymousSystemUsers', JSON.stringify(users));
+            }
+            
+            // 禁用按钮
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-check"></i> 已查看分配内容';
+            
+            showStatus('viewStatus', '您已查看分配的内容，无法再查看其他内容', 'success');
+            updateSystemStatus();
+        });
+        
+        // Fisher-Yates 洗牌算法
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // 生成完美匹配（derangement算法）
+        function generatePerfectMatching(userIds) {
+            if (userIds.length < 2) return {};
+            
+            let matching = {};
+            let shuffled = [...userIds];
+            
+            // 尝试生成完美匹配（没有固定点的排列）
+            let attempts = 0;
+            let success = false;
+            
+            while (attempts < 100 && !success) {
+                // 洗牌
+                shuffleArray(shuffled);
+                success = true;
+                
+                // 检查是否有固定点（用户被分配给自己）
+                for (let i = 0; i < userIds.length; i++) {
+                    if (userIds[i] === shuffled[i]) {
+                        success = false;
+                        break;
+                    }
+                }
+                
+                attempts++;
+            }
+            
+            // 如果生成了完美匹配，创建分配映射
+            if (success) {
+                for (let i = 0; i < userIds.length; i++) {
+                    matching[userIds[i]] = shuffled[i];
+                }
+            }
+            
+            return matching;
+        }
+        
+        // 执行系统匹配 - 只在解锁时执行一次
+        function performSystemMatching() {
+            // 清空现有分配
+            assignments = {};
+            localStorage.setItem('anonymousAssignments', JSON.stringify(assignments));
+            
+            // 获取所有已提交的用户ID
+            const submittedUserIds = submissions.map(s => s.userId);
+            
+            if (submittedUserIds.length < 2) {
+                console.log('至少需要2个用户才能进行匹配');
+                return; // 至少需要2个用户才能匹配
+            }
+            
+            console.log('开始系统匹配，用户数量：', submittedUserIds.length);
+            
+            // 生成完美匹配
+            const newMatching = generatePerfectMatching(submittedUserIds);
+            
+            if (Object.keys(newMatching).length === 0) {
+                console.log('匹配失败，无法生成完美匹配');
+                return;
+            }
+            
+            // 更新分配表
+            for (const giverId in newMatching) {
+                const receiverId = newMatching[giverId];
+                
+                // 找到接收者的内容
+                const receiverSubmission = submissions.find(s => s.userId === receiverId);
+                if (receiverSubmission) {
+                    assignments[giverId] = receiverSubmission.code;
+                }
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('anonymousAssignments', JSON.stringify(assignments));
+            console.log('系统匹配完成，分配数量：', Object.keys(assignments).length);
+        }
+        
+        // 更新系统状态显示
+        function updateSystemStatus() {
+            const totalUsers = users.length;
+            const totalSubmissions = submissions.length;
+            
+            // 计算待分配用户数（已提交但未分配的用户）
+            let pendingUsers = 0;
+            if (isUnlocked()) {
+                const submittedUserIds = submissions.map(s => s.userId);
+                pendingUsers = submittedUserIds.filter(id => !assignments[id]).length;
+            } else {
+                pendingUsers = submissions.length; // 解锁前所有已提交用户都在等待
+            }
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalSubmissions').textContent = totalSubmissions;
+            document.getElementById('pendingUsers').textContent = pendingUsers;
+        }
+        
+        // 生成唯一编码
+        function generateUniqueCode() {
+            let code;
+            do {
+                const part1 = Math.random().toString(36).substr(2, 4).toUpperCase();
+                const part2 = Math.random().toString(36).substr(2, 4).toUpperCase();
+                code = `${part1}-${part2}`;
+            } while (submissions.some(s => s.code === code));
+            
+            return code;
+        }
+        
+        // 显示状态信息
+        function showStatus(elementId, message, type) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = 'status ' + type;
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                statusElement.className = 'status';
+            }, 5000);
+        }
+        
+        // 初始化系统
+        function initializeSystem() {
+            // 检查登录状态
+            if (!checkLoginStatus()) {
+                // 未登录，显示登录界面
+                document.getElementById('authOverlay').style.display = 'flex';
+            }
+            
+            // 设置解锁时间显示
+            const unlockDateStr = UNLOCK_DATE.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const hours = UNLOCK_DATE.getHours().toString().padStart(2, '0');
+            const minutes = UNLOCK_DATE.getMinutes().toString().padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+             const fullDateTimeStr = unlockDateStr + ' ' + timeStr;
+            // 更新页面显示
+                document.getElementById('unlockDate').textContent = fullDateTimeStr;
+                document.getElementById('unlockTime').textContent = fullDateTimeStr;
+                document.getElementById('ruleUnlockTime').textContent = fullDateTimeStr;
+                document.getElementById('ruleUnlockDate').textContent = unlockDateStr;
+                document.getElementById('ruleUnlockTime2').textContent = fullDateTimeStr;
+            
+            
+            checkUnlockStatus();
+            // 初始化系统状态显示
+            updateSystemStatus();
+        }
+        
+        // 启动系统
+        initializeSystem();
+    </script>
+</body>
+</html>
